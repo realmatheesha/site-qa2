@@ -14,10 +14,16 @@ jobs:
 
       - run: npm install
       - run: npx playwright install --with-deps
-      - run: npm run urls          # reads https://rareskills.io/wp-sitemap.xml
-      - run: npm run scan          # change to 'npm run scan:sample' for a quick run
 
-      - uses: actions/upload-artifact@v4
+      - run: npm run urls
+
+      - name: Scan pages
+        run: npm run scan                 # use 'npm run scan:sample' for a fast ~60-page smoke
+        continue-on-error: true           # keep job green even if pages have problems
+
+      - name: Upload Playwright report
+        if: always()                      # upload report even when scan step reports failures
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report
